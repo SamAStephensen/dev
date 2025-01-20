@@ -2,11 +2,11 @@ import queue
 import wave
 import pyaudio
 
-class MicrophoneStream:
+class micstream:
     """Opens a recording stream as a generator yielding the audio chunks."""
     def __init__(self, rate=16000, chunk=1024, log_audio=False, log_file="output.wav", silence_threshold=1000):
         """
-        Initialize the MicrophoneStream.
+        Initialize the micstream.
         
         :param rate: The sample rate of the audio stream.
         :param chunk: The size of each audio chunk.
