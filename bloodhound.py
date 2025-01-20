@@ -16,22 +16,14 @@ class SystemMetrics:
     def get_system_metrics():
         """Get system performance metrics."""
         system_metrics = {
-            "cpu": {
-                "cpu_percent": psutil.cpu_percent(interval=1),
-                "cpu_times_percent": psutil.cpu_times_percent(interval=1)
-            },
-            "memory": {
-                "virtual_memory": psutil.virtual_memory()._asdict(),
-                "swap_memory": psutil.swap_memory()._asdict()
-            },
-            "disk": {
-                "disk_usage": psutil.disk_usage('/')._asdict(),
-                "disk_partitions": psutil.disk_partitions()
-            },
-            "network": {
-                "net_io_counters": psutil.net_io_counters()._asdict(),
-                "net_if_addrs": psutil.net_if_addrs()
-            },
+            "cpu_percent": psutil.cpu_percent(interval=1),
+            "cpu_times_percent": psutil.cpu_times_percent(interval=1)
+            "virtual_memory": psutil.virtual_memory()._asdict(),
+            "swap_memory": psutil.swap_memory()._asdict(),
+            "disk_usage": psutil.disk_usage('/')._asdict(),
+            "disk_partitions": psutil.disk_partitions(),
+            "net_io_counters": psutil.net_io_counters()._asdict(),
+            "net_if_addrs": psutil.net_if_addrs(),
             "cpu_info": cpuinfo.get_cpu_info(),
             "os_info": platform.platform(),
             "hostname": socket.gethostname(),
