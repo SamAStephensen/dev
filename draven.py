@@ -4,6 +4,7 @@ from google.cloud import speech
 from google.cloud import language_v1
 import vertexai
 from vertexai.preview.language_models import TextGenerationModel
+import MicrophoneStream
 
 # Audio recording parameters
 RATE = 16000
@@ -16,57 +17,6 @@ vertexai.init(project=PROJECT_ID, location=LOCATION)
 
 # Initialize Vertex AI Text Generation model
 generation_model = TextGenerationModel.from_pretrained("text-bison@001")
-
-# Microphone Stream Class
-class MicrophoneStream:
-    """Opens a recording stream as a generator yielding audio chunks."""
-    def __init__(self, rate=RATE, chunk=CHUNK):
-        self._rate = rate
-        self._chunk = chunk
-        self._buff = queue.Queue()
-        self.closed = True
-
-    def __enter__(self):
-        self._audio_interface = pyaudio.PyAudio()
-        self._audio_stream = self._audio_interface.open(
-            format=pyaudio.paInt16,
-            channels=1,
-            rate=self._rate,
-            input=True,
-            frames_per_buffer=self._chunk,
-            stream_callback=self._fill_buffer,
-        )
-        self.closed = False
-        return self
-
-    def __exit__(self, type, value, traceback):
-        self._audio_stream.stop_stream()
-        self._audio_stream.close()
-        self.closed = True
-        self._buff.put(None)
-        self._audio_interface.terminate()
-
-    def _fill_buffer(self, in_data, frame_count, time_info, status_flags):
-        """Fill the buffer with audio data."""
-        self._buff.put(in_data)
-        return None, pyaudio.paContinue
-
-    def generator(self):
-        """Generate audio chunks from the buffer."""
-        while not self.closed:
-            chunk = self._buff.get()
-            if chunk is None:
-                return
-            data = [chunk]
-            while True:
-                try:
-                    chunk = self._buff.get(block=False)
-                    if chunk is None:
-                        return
-                    data.append(chunk)
-                except queue.Empty:
-                    break
-            yield b"".join(data)
 
 # Speech-to-Text streaming
 def transcribe_streaming():
