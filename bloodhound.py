@@ -4,6 +4,8 @@ import datetime
 import time
 import logging
 import subprocess
+import json
+import os
 
 # Setup logging to capture any critical information
 logging.basicConfig(filename='system_monitor.log', level=logging.DEBUG)
@@ -111,19 +113,31 @@ def collect_system_info():
 
     return system_info
 
-# Save the data to a /data folder in JSON format
-import json
-import os
-
+# Save the data to a new file with a timestamp
 def save_to_file(data):
     if not os.path.exists('data'):
         os.makedirs('data')
-    with open('data/system_info.json', 'w') as f:
+    
+    # Create a new file name using the current timestamp
+    timestamp = datetime.datetime.now().strftime("%Y%m%d_%H%M%S")
+    file_name = f"data/system_info_{timestamp}.json"
+    
+    with open(file_name, 'w') as f:
         json.dump(data, f, indent=4)
 
-# Example usage
-system_info = collect_system_info()
-save_to_file(system_info)
+    logging.info(f"System data saved to {file_name}")
 
-# Output system information
-print(json.dumps(system_info, indent=4))
+# Run the data collection at intervals
+def run_system_monitor(interval_seconds=3600):
+    while True:
+        try:
+            system_info = collect_system_info()
+            save_to_file(system_info)
+            print(f"System info saved at {datetime.datetime.now()}")
+            time.sleep(interval_seconds)  # Sleep for the specified interval (e.g., 1 hour)
+        except Exception as e:
+            logging.error(f"Error occurred: {e}")
+            time.sleep(60)  # Sleep for 1 minute before retrying
+
+if __name__ == "__main__":
+    run_system_monitor(interval_seconds=3600)  # Collect and save every 1 hour (3600 seconds)
