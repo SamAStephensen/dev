@@ -4,7 +4,7 @@ from google.cloud import speech
 from google.cloud import language_v1
 import vertexai
 from vertexai.preview.language_models import TextGenerationModel
-import MicrophoneStream
+import micstream
 
 # Audio recording parameters
 RATE = 16000
