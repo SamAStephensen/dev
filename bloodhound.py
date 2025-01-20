@@ -11,13 +11,13 @@ import cpuinfo
 # System Metrics Class
 class SystemMetrics:
     """Class to handle system metrics collection."""
-    
+
     @staticmethod
     def get_system_metrics():
         """Get system performance metrics."""
         system_metrics = {
             "cpu_percent": psutil.cpu_percent(interval=1),
-            "cpu_times_percent": psutil.cpu_times_percent(interval=1)
+            "cpu_times_percent": psutil.cpu_times_percent(interval=1),
             "virtual_memory": psutil.virtual_memory()._asdict(),
             "swap_memory": psutil.swap_memory()._asdict(),
             "disk_usage": psutil.disk_usage('/')._asdict(),
@@ -27,9 +27,37 @@ class SystemMetrics:
             "cpu_info": cpuinfo.get_cpu_info(),
             "os_info": platform.platform(),
             "hostname": socket.gethostname(),
-            "ip_address": socket.gethostbyname(socket.gethostname())
+            "ip_address": socket.gethostbyname(socket.gethostname()),
+            "processes": SystemMetrics.get_process_info()  # Get process-level data
         }
         return system_metrics
+
+    @staticmethod
+    def get_process_info():
+        """Get information for each process running on the system."""
+        processes = []
+        
+        # Iterate over all PIDs and gather process details
+        for pid in psutil.pids():
+            try:
+                proc = psutil.Process(pid)
+                proc_info = {
+                    "pid": pid,
+                    "name": proc.name(),
+                    "status": proc.status(),
+                    "cpu_percent": proc.cpu_percent(interval=1),
+                    "memory_info": proc.memory_info()._asdict(),
+                    "open_files": proc.open_files(),
+                    "connections": proc.connections(kind='inet'),
+                    "exe": proc.exe(),
+                    "create_time": datetime.fromtimestamp(proc.create_time()).isoformat(),
+                    "user": proc.username()
+                }
+                processes.append(proc_info)
+            except (psutil.NoSuchProcess, psutil.AccessDenied, psutil.ZombieProcess):
+                continue  # Ignore processes that have been terminated or are inaccessible
+        
+        return processes
 
     @staticmethod
     def log_system_metrics():
@@ -47,10 +75,11 @@ class SystemMetrics:
         
         print(f"System metrics logged to {log_file}")
 
+
 # Network Metrics Class
 class NetworkMetrics:
     """Class to handle network metrics collection."""
-    
+
     @staticmethod
     def get_network_metrics():
         """Get network metrics using psutil."""
@@ -140,6 +169,7 @@ class NetworkMetrics:
             json.dump(data, f, indent=4)
         
         print(f"Network metrics logged to {log_file}")
+
 
 # Function to run at regular intervals
 def run_audit(interval=60):
