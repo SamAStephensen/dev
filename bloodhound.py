@@ -76,7 +76,7 @@ class SystemMetrics(AuditLog):
                     "cpu_percent": proc.cpu_percent(interval=1),
                     "memory_info": proc.memory_info()._asdict(),
                     "open_files": proc.open_files(),
-                    "connections": proc.connections(kind='inet'),
+                    "connections": proc.net_connections(kind='inet'),
                     "exe": proc.exe(),
                     "create_time": datetime.fromtimestamp(proc.create_time()).isoformat(),
                     "user": proc.username()
