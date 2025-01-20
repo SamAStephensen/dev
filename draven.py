@@ -57,7 +57,7 @@ def process_responses(responses):
 # Detect if the text is a question or ask
 def is_question(text):
     """Simple heuristic to detect questions or asks."""
-    question_keywords = ["what", "why", "how", "when", "who", "can", "could", "would", "is", "are", "do", "does"]
+    question_keywords = ["describe","show", "explain", "what", "why", "how", "when", "who", "can", "could", "would", "is", "are", "do", "does"]
     return any(word in text.lower() for word in question_keywords) or text.strip().endswith("?")
 
 # Generate response using Vertex AI
