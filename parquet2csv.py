@@ -30,6 +30,6 @@ def convert_parquet_to_csv(parquet_file, csv_folder):
 
 # Example usage
 if __name__ == "__main__":
-    parquet_file = "./parquet_files/data1.parquet"  # Replace with the Parquet file you want to convert
-    csv_folder = "./csv_files"  # Replace with your desired CSV folder path
+    parquet_file = "/Users/samstephensen/Documents/pyscripts/data/stocks/AAPL.parquet"  # Replace with the Parquet file you want to convert
+    csv_folder = "/Users/samstephensen/Documents/pyscripts/data/stocks/AAPL.csv"  # Replace with your desired CSV folder path
     convert_parquet_to_csv(parquet_file, csv_folder)
