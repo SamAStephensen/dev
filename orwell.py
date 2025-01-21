@@ -22,20 +22,20 @@ class InputLogger:
         # Ensure the log directory exists
         os.makedirs(os.path.join(self.current_directory, directory), exist_ok=True)
 
-        # Setup the CSV file
         self.setup_csv()
 
     def setup_csv(self):
         try:
             with open(
+                # 'x' mode creates the file if it doesn't exist
                 self.log_file, "x", newline=""
-            ) as file:  # 'x' mode creates the file if it doesn't exist
+            ) as file:  
                 writer = csv.writer(file)
                 writer.writerow(
                     ["Timestamp", "Event_Type", "Event_Description", "Additional_Info"]
                 )
         except FileExistsError:
-            pass  # File already exists, no need to create it
+            pass  
 
     def log_event(self, event_type, event_description, additional_info=""):
         timestamp = datetime.now().strftime("%Y-%m-%d %H:%M:%S")
@@ -74,8 +74,8 @@ class InputLogger:
 
         if key == keyboard.Key.esc:
             self.log_event("keyboard", "Key pressed: ESC - Exiting")
-            self.stop_program = True
-            return False
+            self.stop() 
+            return False  # This stops the keyboard listener
 
     def on_mouse_move(self, x, y):
         self.log_event("mouse", "Mouse moved", f"({x}, {y})")
@@ -87,28 +87,42 @@ class InputLogger:
     def on_mouse_scroll(self, x, y, dx, dy):
         self.log_event("mouse", "Mouse scrolled", f"({x}, {y}) with delta ({dx}, {dy})")
 
+    def stop(self):
+        # This method will stop the program by setting stop_program to True
+        print("Shutting down...")
+        self.stop_program = True
+        # Stop both listeners
+        self.keyboard_listener.stop()
+        self.mouse_listener.stop()
+
     def start(self):
+        # Start the thread that writes events to file
         writer_thread = threading.Thread(target=self.write_events_to_file, daemon=True)
         writer_thread.start()
 
-        keyboard_listener = keyboard.Listener(
+        # Create and start the keyboard listener
+        self.keyboard_listener = keyboard.Listener(
             on_press=self.on_key_press, on_release=self.on_key_release
         )
 
-        mouse_listener = mouse.Listener(
+        # Create and start the mouse listener
+        self.mouse_listener = mouse.Listener(
             on_move=self.on_mouse_move,
             on_click=self.on_mouse_click,
             on_scroll=self.on_mouse_scroll,
         )
 
-        # Start listeners and block until ESC is pressed
         try:
             print("Recording keyboard and mouse events. Press ESC to stop...")
-            keyboard_listener.start()
-            mouse_listener.start()
 
-            keyboard_listener.join()
-            mouse_listener.join()
+            # Start the listeners
+            self.keyboard_listener.start()
+            self.mouse_listener.start()
+
+            # Block until ESC is pressed (join blocks until the listener stops)
+            self.keyboard_listener.join()
+            self.mouse_listener.join()
+
         except Exception as e:
             print(f"Error while running listeners: {e}")
         finally:
