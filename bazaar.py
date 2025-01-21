@@ -63,15 +63,15 @@ class MarketIngest:
         """
         if find_file:
             current_date = datetime.today().strftime('%Y-%m-%d')
-            last_date = get_last_date(ticker) 
+            last_date = self.get_last_date(ticker) 
             print(f"Fetching current day's data for {ticker}...")
-            get_data(ticker, last_date, current_date)
+            self.get_data(ticker, last_date, current_date)
 
 # Example usage
 if __name__ == "__main__":
     tickers = ['AAPL', 'GOOGL', 'AMZN']
     
-    pipeline = StockDataPipeline(data_folder='/data/stocks')
+    pipeline = MarketIngest(data_folder='/data/stocks')
 
     # Fetch historical data for all tickers (for a given date range)
     for ticker in tickers:
